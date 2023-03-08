@@ -5,7 +5,6 @@
         <div class="card-body">
           <form @submit.prevent="handleLogin">
             <div class="mb-3 text-center">
-              <img src="@/assets/vite.svg" height="80" alt="Vite logo"/>
               <img src="/vue.svg" height="80" alt="Vue logo"/>
             </div>
             <div class="mb-3">
@@ -49,8 +48,9 @@
 import { defineComponent } from 'vue';
 import UserAuthenticated from '@/models/UserAuthenticated';
 import { handleSetUserAuthenticated } from '@/store/actions/auth';
-import type { IUserCredentials } from '@/interfaces';
+import type { TUserAuthenticated, TUserCredentials } from '@/types';
 import mockLoginRequest from '@/mocks/auth.mock';
+import { ErrorAlert } from '@/services/swal.service';
 
 export default defineComponent({
   name: 'Login',
@@ -60,23 +60,18 @@ export default defineComponent({
       credentials: {
         email: '',
         password: '',
-      } as IUserCredentials,
+      } as TUserCredentials,
     };
-  },
-  unmounted() {
-    this.credentials.email = '';
-    this.credentials.password = '';
-    this.isLoading = false;
   },
   methods: {
     async handleLogin() {
       try {
         this.isLoading = true;
-        const user = await mockLoginRequest(this.credentials);
-        handleSetUserAuthenticated(new UserAuthenticated(user as UserAuthenticated));
+        const user: TUserAuthenticated = await mockLoginRequest(this.credentials);
+        handleSetUserAuthenticated(new UserAuthenticated(user));
         this.$router.push({ name: 'dashboard' });
       } catch (e) {
-        console.error(e);
+        ErrorAlert.fire({});
       } finally {
         this.isLoading = false;
       }

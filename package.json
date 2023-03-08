@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "run-p type-check build-only",
     "preview": "vite preview --port 4173",
     "build-only": "vite build",
@@ -14,6 +14,8 @@
     "@popperjs/core": "^2.11.6",
     "axios": "^0.26.1",
     "bootstrap": "^5.2.1",
+    "moment": "^2.29.4",
+    "sweetalert2": "^11.7.3",
     "vue": "^3.2.38",
     "vue-router": "^4.1.5"
   },

@@ -11,6 +11,7 @@ const mixedRoutes: RouteRecordRaw[] = [
   },
   {
     path: '/:pathMatch(.*)*',
+    name: 'notfound',
     redirect: { name: 'dashboard' },
   },
 ];

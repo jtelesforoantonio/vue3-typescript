@@ -10,7 +10,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in pokemonCollection.results" :key="item.name">
+          <tr v-for="item in paginationResponse.results" :key="item.name">
             <td>{{ item.name }}</td>
             <td>
               <button
@@ -41,19 +41,23 @@
       </nav>
     </div>
   </div>
-  <Modal v-model="showModal" :title="pokemon.name">
-    <img :src="pokemon.imageUrl" :alt="pokemon.name" class="img-fluid mx-auto d-block"/>
+  <Modal v-model="showModal">
+    <img :src="pokemon.image_url" :alt="pokemon.name" class="img-fluid mx-auto d-block"/>
   </Modal>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import pokemonApi from '@/api/PokemonApi';
-import type { IPokemon, IPokemonCollection, IPokemonPagination } from '@/interfaces';
+import type { TPokemon, TPokemonPaginationQuery, TPokemonPaginationResponse } from '@/types';
 import Loader from '@/components/Loader.vue';
 import Modal from '@/components/Modal.vue';
+import { ErrorAlert } from '@/services/swal.service';
 
 export default defineComponent({
+  /**
+   * @overview Componente usando la API de Opciones.
+   */
   name: 'PokemonList',
   components: { Modal, Loader },
   data() {
@@ -65,20 +69,21 @@ export default defineComponent({
         currentPage: 1,
         limit: 15,
         offset: 0,
-      } as IPokemonPagination,
-      pokemonCollection: {
+      } as TPokemonPaginationQuery,
+      paginationResponse: {
         count: 0,
         next: '',
         previous: '',
         results: [],
-      } as IPokemonCollection,
+      } as TPokemonPaginationResponse,
       detailsFor: '',
       pokemon: {
         id: 0,
         name: '',
-        imageUrl: '',
-      } as IPokemon,
-      pokemonCache: [] as IPokemon[],
+        sprites: [],
+        image_url: '',
+      } as TPokemon,
+      pokemonCache: [] as TPokemon[],
     };
   },
   created() {
@@ -91,9 +96,9 @@ export default defineComponent({
         this.pagination.currentPage = page;
         this.pagination.offset = page * this.pagination.limit;
         const { data } = await pokemonApi.paginate(this.pagination);
-        this.pokemonCollection = data;
+        this.paginationResponse = data;
       } catch (e) {
-        console.error(e);
+        ErrorAlert.fire({});
       } finally {
         this.loadingData = false;
       }
@@ -103,13 +108,14 @@ export default defineComponent({
         this.detailsFor = name;
         this.loadingDetails = true;
         if (this.pokemon.name !== name) {
-          let pokemonDetails = this.pokemonCache.find(p => p.name === name);
+          let pokemonDetails: TPokemon = this.pokemonCache.find(p => p.name === name);
           if (!pokemonDetails) {
             const { data } = await pokemonApi.get(name);
             pokemonDetails = {
               id: data.id,
-              name: name,
-              imageUrl: data.sprites.other['official-artwork'].front_default,
+              name,
+              sprites: data.sprites,
+              image_url: data.sprites.other['official-artwork'].front_default,
             };
             this.pokemonCache.push(pokemonDetails);
           }
@@ -117,7 +123,7 @@ export default defineComponent({
         }
         this.showModal = true;
       } catch (e) {
-        console.error(e);
+        ErrorAlert.fire({});
       } finally {
         this.loadingDetails = false;
       }

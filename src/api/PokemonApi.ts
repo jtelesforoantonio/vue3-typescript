@@ -1,7 +1,7 @@
-import type { IPokemonPagination } from '@/interfaces';
 import ApiResource from '@/api/ApiResource';
 import type { AxiosInstance, AxiosResponse } from 'axios';
 import createAxios from '@/services/axios.service';
+import type { TPokemon, TPokemonPaginationQuery, TPokemonPaginationResponse } from '@/types';
 
 class PokemonApi extends ApiResource {
   protected readonly baseUrl = `${import.meta.env.VITE_POKEMON_API_URL}/pokemon`;
@@ -12,11 +12,11 @@ class PokemonApi extends ApiResource {
     this.api = createAxios(this.baseUrl);
   }
 
-  paginate(query: IPokemonPagination): Promise<AxiosResponse> {
+  paginate(query: TPokemonPaginationQuery): Promise<AxiosResponse<TPokemonPaginationResponse>> {
     return this.api.get('', { params: query });
   }
 
-  get(name: string): Promise<AxiosResponse> {
+  get(name: string): Promise<AxiosResponse<TPokemon>> {
     return this.api.get(`/${name}`);
   }
 

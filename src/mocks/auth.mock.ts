@@ -1,15 +1,13 @@
-import type { IUserCredentials } from '@/interfaces';
+import type { TUserCredentials } from '@/types';
 import { faker } from '@faker-js/faker';
 
-export default function mockLoginRequest(credentials: IUserCredentials) {
+export default function mockLoginRequest(credentials: TUserCredentials): Promise<any> {
   return new Promise(resolve => {
-    setTimeout(() => {
-      const user = {
-        id: 1,
-        name: faker.name.fullName(),
-        email: credentials.email,
-      };
-      resolve(user);
-    }, 100);
+    const user = {
+      id: 1,
+      name: faker.name.fullName(),
+      email: credentials.email,
+    };
+    setTimeout(() => resolve(user), 100);
   });
 }

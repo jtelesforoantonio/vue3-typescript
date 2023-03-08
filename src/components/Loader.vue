@@ -6,16 +6,13 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+/**
+ * @overview Componente usando la API de Composición.
+ */
+type TProps = {
+  show: boolean;
+}
 
-export default defineComponent({
-  name: 'Loader',
-  props: {
-    show: {
-      type: Boolean,
-      required: true,
-    },
-  },
-});
+defineProps<TProps>();
 </script>

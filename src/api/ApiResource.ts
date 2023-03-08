@@ -1,17 +1,16 @@
-import type { AxiosInstance, AxiosResponse } from 'axios';
-import type { IApiResource } from '@/interfaces';
+import type { AxiosInstance } from 'axios';
 
-export default abstract class ApiResource implements IApiResource {
+export default abstract class ApiResource {
   protected abstract readonly baseUrl: string;
   protected abstract readonly api: AxiosInstance;
 
-  abstract paginate(query: any): Promise<AxiosResponse>;
+  abstract paginate(query: any): Promise<any>;
 
-  abstract get(id: string | number): Promise<AxiosResponse>;
+  abstract get(id: string | number): Promise<any>;
 
-  abstract delete(id: string | number): Promise<AxiosResponse>;
+  abstract delete(id: string | number): Promise<any>;
 
-  abstract store(data: any): Promise<AxiosResponse>;
+  abstract store(data: any): Promise<any>;
 
-  abstract update(id: string | number, data: any): Promise<AxiosResponse>;
+  abstract update(id: string | number, data: any): Promise<any>;
 }

@@ -1,9 +1,9 @@
 <template>
-  <div id="modal" class="modal fade" tabindex="-1">
+  <div ref="modalElement" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div v-show="!hideHeader" class="modal-header">
-          <slot name="header" :hide="hide">
+          <slot name="header">
             <h5 class="modal-title">{{ title }}</h5>
             <button v-show="!hideTopCloseButton" type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </slot>
@@ -12,8 +12,8 @@
           <slot></slot>
         </div>
         <div class="modal-footer">
-          <slot name="footer" :hide="hide">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <slot name="footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
           </slot>
         </div>
       </div>
@@ -21,86 +21,66 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+/**
+ * @overview Componente usando la API de Composición.
+ */
 import { Modal } from 'bootstrap';
+import { onMounted, ref, watch, withDefaults } from 'vue';
 
-export default defineComponent({
-  name: 'Modal',
-  props: {
-    modelValue: {
-      type: Boolean,
-    },
-    title: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    backdropStatic: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    keyboard: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
-    hideHeader: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    hideTopCloseButton: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
-  emits: ['update:modelValue'],
-  data() {
-    return {
-      modal: null as Modal | null,
-    };
-  },
-  watch: {
-    modelValue(value) {
-      if (value) this.show();
-    },
-  },
-  mounted() {
-    new Promise((resolve, reject) => {
-      try {
-        const modal = new Modal('#modal', {
-          backdrop: this.backdropStatic ? 'static' : true,
-          keyboard: this.keyboard,
-        });
-        resolve(modal);
-      } catch (e) {
-        reject(e);
-      }
-    })
-      .then(modal => {
-        this.modal = modal as Modal;
-        this._bindBootstrapEvents();
-      })
-      .catch(e => console.error(e));
-  },
-  methods: {
-    _bindBootstrapEvents() {
-      const modal = document.getElementById('modal');
-      modal?.addEventListener('hide.bs.modal', () => this.emitUpdateEvent(false));
-      modal?.addEventListener('show.bs.modal', () => this.emitUpdateEvent(true));
-    },
-    show() {
-      this.modal?.show();
-    },
-    hide() {
-      this.modal?.hide();
-    },
-    emitUpdateEvent(value: boolean) {
-      this.$emit('update:modelValue', value);
-    },
-  },
+let modal: Modal;
+
+/**
+ * Podrías decir que la declaración de la interfaz se puede mover a un archivo para que sea más limpio, tienes razón,
+ * pero actualmente Vue no lo soporta, pero quizá una version posterior lo haga.
+ *
+ * @see https://vuejs.org/guide/typescript/composition-api.html#syntax-limitations
+ * @see https://vuejs.org/guide/typescript/composition-api.html#typing-component-props
+ */
+type TProps = {
+  modelValue: boolean;
+  title?: string;
+  backdropStatic?: boolean;
+  keyboard?: boolean;
+  hideHeader?: boolean;
+  hideTopCloseButton?: boolean;
+}
+
+/**
+ * @see https://vuejs.org/guide/typescript/composition-api.html#props-default-values
+ */
+const props = withDefaults(defineProps<TProps>(), { title: '' });
+
+/**
+ * @see https://vuejs.org/guide/typescript/composition-api.html#typing-component-emits
+ */
+const emits = defineEmits<{
+  (e: 'update:modelValue', value: boolean): void,
+}>();
+
+/**
+ * En la API de opciones para acceder a un elemento del DOM usamos this.$refs.<elemento>, para hacer lo mismo en la
+ * API de Composición el valor de ref y el nombre de la variable deben ser iguales, ya que Vue se encargara de resolver
+ * el valor.
+ *
+ * @see https://vuejs.org/guide/essentials/template-refs.html#accessing-the-refs
+ * @see https://vuejs.org/guide/typescript/composition-api.html#typing-template-refs
+ *
+ * Para poder determinar el tipo de dato se puede utilizar el tipo Ref<T> o sobreescribiendo el tipo por defecto
+ * como se está haciendo en este caso.
+ *
+ * @see https://vuejs.org/guide/typescript/composition-api.html#typing-ref
+ */
+const modalElement = ref<HTMLElement | null>(null);
+
+onMounted(() => {
+  modal = new Modal(modalElement.value as HTMLElement, {
+    backdrop: props.backdropStatic ? 'static' : true,
+    keyboard: props.keyboard,
+  });
+  modalElement.value?.addEventListener('hide.bs.modal', () => emits('update:modelValue', false));
+  modalElement.value?.addEventListener('show.bs.modal', () => emits('update:modelValue', true));
 });
+
+watch(() => props.modelValue, (newValue: boolean) => newValue ? modal.show() : modal.hide());
 </script>

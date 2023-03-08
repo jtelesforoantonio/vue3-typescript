@@ -1,19 +1,18 @@
-import type { IUserAuthenticated } from '@/interfaces';
+import type { TUserAuthenticated } from '@/types';
 
 export default class UserAuthenticated {
+  readonly preferredNickname: string = 'name';
   readonly id: number;
   name: string;
   email: string;
-  nickname: string;
 
-  constructor(data?: IUserAuthenticated) {
+  constructor(data: Partial<TUserAuthenticated> = {}) {
     this.id = data?.id || 0;
     this.name = data?.name || '';
     this.email = data?.email || '';
-    this.nickname = this.name || this.email;
   }
 
-  refreshNickname() {
-    this.nickname = this.name || this.email;
+  get nickname(): string {
+    return this[this.preferredNickname];
   }
 }

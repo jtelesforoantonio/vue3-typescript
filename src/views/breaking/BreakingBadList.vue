@@ -10,14 +10,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="character in characterCollection.results" :key="character.name">
+          <tr v-for="character in characterCollection.characters" :key="character.id">
             <td>{{ character.name }}</td>
             <td>
               <button
                 type="button"
                 class="btn btn-outline-success btn-sm"
                 :disabled="false"
-                @click="getCharacter(character.char_id)"
+                @click="getCharacter(character.id)"
               >
                 <span v-show="false" class="spinner-border spinner-border-sm"></span>
                 Details
@@ -39,15 +39,20 @@
     </div>
   </div>
   <Modal v-model="showModal" :title="character.name">
-    <img :src="character.imageUrl" :alt="character.name" class="img-fluid mx-auto d-block"/>
+    <img :src="character.image_url" :alt="character.name" class="img-fluid mx-auto d-block"/>
   </Modal>
 </template>
 
 <script lang="ts">
+/**
+ * @overview Componente usando la API de Opciones.
+ */
 import { defineComponent } from 'vue';
 import breakingBadApi from '@/api/BreakingBadApi';
 import Loader from '@/components/Loader.vue';
 import Modal from '@/components/Modal.vue';
+import type { TBreakingBadCharacter, TBreakingBadPaginationResponse } from '@/types';
+import { ErrorAlert } from '@/services/swal.service';
 
 export default defineComponent({
   name: 'BreakingBadList',
@@ -57,13 +62,14 @@ export default defineComponent({
       loadingData: false,
       showModal: false,
       characterCollection: {
-        results: [],
-      },
+        total: 0,
+        characters: [],
+      } as TBreakingBadPaginationResponse,
       character: {
         id: 0,
         name: '',
-        imageUrl: '',
-      },
+        image_url: '',
+      } as TBreakingBadCharacter,
     };
   },
   created() {
@@ -73,12 +79,10 @@ export default defineComponent({
     async paginate() {
       try {
         this.loadingData = true;
-        const { data } = await breakingBadApi.paginate({});
-        this.characterCollection = {
-          results: data,
-        };
+        const { data } = await breakingBadApi.paginate();
+        this.characterCollection = data;
       } catch (e) {
-        console.error(e);
+        ErrorAlert.fire({});
       } finally {
         this.loadingData = false;
       }
@@ -86,15 +90,10 @@ export default defineComponent({
     async getCharacter(id: number) {
       try {
         const { data } = await breakingBadApi.get(id);
-        this.character = {
-          id: data[0].char_id,
-          name: `${data[0].name} (${data[0].nickname})`,
-          imageUrl: data[0].img,
-        };
+        this.character = data;
         this.showModal = true;
-        console.info(data);
       } catch (e) {
-        console.error(e);
+        ErrorAlert.fire({});
       }
     },
   },
