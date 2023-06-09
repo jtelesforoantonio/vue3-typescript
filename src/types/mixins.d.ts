@@ -17,7 +17,7 @@ export declare type TRouteNames = {
 
 export declare type TPaginationQuery = {
   page: number;
-  items?: number;
+  items: number;
   sort_by?: string;
   sort_dir?: string;
   search?: string;

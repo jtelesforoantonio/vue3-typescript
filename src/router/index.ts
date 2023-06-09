@@ -17,8 +17,11 @@ const routes = [
 
 const RouteNames = {} as TRouteNames;
 routes.forEach(route => {
-  const name = route.name.replace('.', '_').toUpperCase();
-  RouteNames[name] = route.name;
+  const name = route.name;
+  if (typeof name === 'string') {
+    const key = name.replace('.', '_').toUpperCase() as keyof typeof RouteNames;
+    RouteNames[key] = name;
+  }
 });
 
 const router = createRouter({

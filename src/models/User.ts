@@ -33,7 +33,7 @@ export default class User extends Model {
     super(user);
     this.name = user.name ?? '';
     this.email = user.email ?? '';
-    this.status = user.status ? statusFromValue(user.status) : Status.UNKNOWN;
+    this.status = statusFromValue(user.status ?? '');
   }
 
   static collection(users: TUser[]): User[] {

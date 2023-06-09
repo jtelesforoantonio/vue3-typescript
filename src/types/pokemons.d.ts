@@ -1,13 +1,7 @@
 export declare type TPokemon = {
   readonly id: number;
   readonly name: string;
-  readonly sprites: {
-    other: {
-      'official-artwork': {
-        'front_default': string;
-      }
-    }
-  };
+  readonly sprites: Record;
   readonly image_url: string;
 }
 

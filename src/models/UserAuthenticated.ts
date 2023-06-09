@@ -1,15 +1,15 @@
 import type { TUserAuthenticated } from '@/types';
 
 export default class UserAuthenticated {
-  readonly preferredNickname: string = 'name';
+  readonly preferredNickname: 'name' | 'email' = 'name';
   readonly id: number;
   name: string;
   email: string;
 
   constructor(data: Partial<TUserAuthenticated> = {}) {
-    this.id = data?.id || 0;
-    this.name = data?.name || '';
-    this.email = data?.email || '';
+    this.id = data.id ?? 0;
+    this.name = data.name ?? '';
+    this.email = data.email ?? '';
   }
 
   get nickname(): string {

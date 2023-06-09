@@ -108,7 +108,7 @@ export default defineComponent({
         this.detailsFor = name;
         this.loadingDetails = true;
         if (this.pokemon.name !== name) {
-          let pokemonDetails: TPokemon = this.pokemonCache.find(p => p.name === name);
+          let pokemonDetails = this.pokemonCache.find(p => p.name === name);
           if (!pokemonDetails) {
             const { data } = await pokemonApi.get(name);
             pokemonDetails = {

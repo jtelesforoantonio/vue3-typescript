@@ -8,7 +8,7 @@ const defaultTimeout = 100;
 const mockUsers = {
   getUsers(query: TPaginationQuery): Promise<any> {
     return new Promise(resolve => {
-      const data = [];
+      const data: any = [];
       for (let i = 0; i < query.items; i++) {
         data.push({
           id: (i + 1),
